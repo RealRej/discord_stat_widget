@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rank Widget</title>
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<div class="wrap wide">
+  <div class="topbar">
+    <div class="brand"><span class="mark"></span><h1>RANK WIDGET</h1><span class="admin-badge" id="adminBadge" style="display:none;">ADMIN</span></div>
+    <button class="signout" id="signOutBtn">Sign out</button>
+  </div>
+
+  <!-- LOOKUP -->
+  <div class="panel">
+    <h2>Look up a player</h2>
+    <p class="hint">Works for anyone's Riot ID — you don't need their password or API key, just their name and tag.</p>
+    <div class="row">
+      <div>
+        <label for="gameName">Riot ID</label>
+        <input id="gameName" placeholder="e.g. Faker">
+      </div>
+      <div style="max-width:140px;">
+        <label for="tagLine">Tag</label>
+        <input id="tagLine" placeholder="e.g. KR1">
+      </div>
+      <div style="max-width:130px;">
+        <label for="platformSelect">Server</label>
+        <select id="platformSelect">
+          <option value="auto">Auto-detect</option>
+          <option value="na1">NA</option>
+          <option value="euw1">EUW</option>
+          <option value="eun1">EUNE</option>
+          <option value="kr">KR</option>
+          <option value="br1">BR</option>
+          <option value="jp1">JP</option>
+          <option value="ru">RU</option>
+          <option value="oc1">OCE</option>
+          <option value="tr1">TR</option>
+          <option value="la1">LAN</option>
+          <option value="la2">LAS</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn-primary" id="lookupBtn">Look up</button>
+    <div class="msg" id="lookupMsg"></div>
+
+    <div class="progress-wrap" id="progressWrap" style="display:none;">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">Working...</div>
+    </div>
+
+    <div class="card-result" id="cardResult">
+      <div class="card-hero" id="cardHero">
+        <img class="card-hero-bg" id="cardHeroBg" alt="">
+        <div class="card-hero-content">
+          <img id="rankIcon" alt="">
+          <div>
+            <div class="name" id="riotIdOut"></div>
+            <div class="server" id="serverOut"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-box"><img id="rankIcon2" alt=""><div><div class="label">Rank</div><div class="value" id="rankOut"></div></div></div>
+        <div class="stat-box"><img id="peakIcon" alt=""><div><div class="label">Peak</div><div class="value" id="peakOut"></div></div></div>
+        <div class="stat-box"><img id="roleIcon" alt=""><div><div class="label">Main role</div><div class="value" id="roleOut"></div></div></div>
+        <div class="stat-box"><div><div class="label">Win / Loss</div><div class="value" id="wlOut"></div></div></div>
+      </div>
+
+      <div>
+        <label>Recent games</label>
+        <div class="match-history" id="historyOut"></div>
+      </div>
+
+      <div class="champ-row" id="champRow"></div>
+
+      <button class="btn-secondary" id="pushBtn" style="width:100%; margin-top:16px;">Push this to my Discord profile</button>
+      <div class="msg" id="pushMsg"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel">
+    <h2><span class="status-dot" id="statusDot"></span>Your Discord connection</h2>
+    <p class="hint">
+      This is what lets <strong>your own</strong> lookups get pushed onto <strong>your own</strong> Discord profile.
+      It's separate per person — each friend fills this in once with their own values:
+    </p>
+    <ol class="setup-steps">
+      <li>Go to the <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a> and click <strong>New Application</strong>.</li>
+      <li>On the <strong>General Information</strong> page, copy the <strong>Application ID</strong> — paste it below.</li>
+      <li>Open the <strong>Bot</strong> tab, click <strong>Reset Token</strong>, and copy the token — paste it below. Keep this private; it's encrypted before it's stored, but treat it like a password.</li>
+      <li>Your <strong>Discord User ID</strong>: in Discord, enable Developer Mode (User Settings → Advanced), then right-click your own name and choose <strong>Copy User ID</strong>.</li>
+    </ol>
+    <p class="hint" style="color: var(--red);">
+      Heads up: this profile-push feature relies on an undocumented Discord endpoint (it's not part of Discord's official public API), so it can stop working without notice if Discord changes it.
+    </p>
+
+    <label for="appId">Application ID</label>
+    <input id="appId" placeholder="123456789012345678">
+
+    <label for="discordUserId">Your Discord User ID</label>
+    <input id="discordUserId" placeholder="123456789012345678">
+
+    <label for="botToken">Bot Token</label>
+    <input id="botToken" type="password" placeholder="Leave blank to keep the one already saved">
+
+    <button class="btn-primary" id="saveCredsBtn">Save settings</button>
+    <div class="msg" id="credsMsg"></div>
+  </div>
+
+  <!-- ADMIN (only visible to the admin account) -->
+  <div class="panel" id="adminPanel" style="display:none;">
+    <h2>Registered summoners</h2>
+    <p class="hint">Everyone who's created an account on this site, and whether they've finished their Discord setup.</p>
+    <div style="overflow-x:auto;">
+    <table class="admin-table" id="adminTable">
+      <thead><tr><th>Username</th><th>Joined</th><th>Discord linked</th><th>Role</th><th>Actions</th></tr></thead>
+      <tbody id="adminTableBody"></tbody>
+    </table>
+    </div>
+    <p class="hint" style="margin-top:10px;">Editing a friend's settings here lets you fix a typo or finish their setup for them — it won't show you their existing bot token, only let you replace it.</p>
+  </div>
+
+  <p class="disclaimer">Fan-made tool. Not affiliated with or endorsed by Riot Games.</p>
+</div>
+
+<script src="/js/toast.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>
